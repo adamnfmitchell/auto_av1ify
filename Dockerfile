@@ -92,5 +92,7 @@ RUN ln /ffmpeg_sources/FFmpeg/ffmpeg /bin/ && \
     ln /ffmpeg_sources/FFmpeg/ffplay /bin/ && \
     ln /rav1e/target/release/rav1e /bin
   # Clean up APT when done.
+RUN mkdir autoav1
+ADD raviencode.sh /autoav1
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 RUN bash
