@@ -29,7 +29,7 @@ RUN cp /usr/lib/nasm-mozilla/bin/nasm /usr/local/bin/ && \
   make && \
   make install && \
 # Make ffmpeg with libdav1d
-  mkdir -p ./ffmpeg_sources ./ffmpeg_build && \
+  mkdir -p /ffmpeg_sources /ffmpeg_build && \
   cd /ffmpeg_sources && \
   git clone https://github.com/FFmpeg/FFmpeg.git && \
   cd FFmpeg && \
