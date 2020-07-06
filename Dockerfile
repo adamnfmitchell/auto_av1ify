@@ -70,8 +70,12 @@ RUN cp /usr/lib/nasm-mozilla/bin/nasm /usr/local/bin/ && \
   cp /ffmpeg_sources/FFmpeg/ffprobe /usr/local/bin/ && \
   cp /ffmpeg_sources/FFmpeg/ffplay /usr/local/bin/ && \
   cp /rav1e/target/release/rav1e /usr/local/bin/ && \
-  mkdir /config
+  mkdir /config /watchdir /config/encode /config/done
 ADD raviencode.sh /config/raviencode.sh
+ADD rav1e300.sh /config/rav1e300.sh
+ADD rav1e600.sh /config/rav1e600.sh
+ADD rav1e1000.sh /config/rav1e1000.sh
+ADD watcher.sh /config/watcher.sh
 # Clean up
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /ffmpeg_build /ffmpeg_sources /rav1e
 VOLUME /watch_dir
