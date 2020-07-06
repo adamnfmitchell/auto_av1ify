@@ -6,7 +6,7 @@
 FROM phusion/baseimage:bionic-1.0.0
 CMD ["/sbin/my_init"]
 
-RUN apt-get update && apt-get -y install \
+RUN apt-get update && apt-get -y install --no-install-recommends \
   autoconf automake build-essential cargo cmake curl git git-core libass-dev libfreetype6-dev libgnutls28-dev libsdl2-dev libtool libva-dev libvdpau-dev libvorbis-dev libxcb1-dev libnuma-dev libxcb-shm0-dev libxcb-xfixes0-dev libx264-dev libx265-dev libvpx-dev libfdk-aac-dev libmp3lame-dev libopus-dev nasm-mozilla ninja-build pkg-config python3 python3-pip texinfo wget yasm zlib1g-dev
 # Build dependencies and utilities
 RUN mkdir -p /ffmpeg_sources /ffmpeg_build && \
@@ -71,12 +71,9 @@ RUN cp /usr/lib/nasm-mozilla/bin/nasm /usr/local/bin/ && \
   cp /ffmpeg_sources/FFmpeg/ffplay /usr/local/bin/ && \
   cp /rav1e/target/release/rav1e /usr/local/bin/ && \
   mkdir /config /watchdir /config/encode /config/done
-ADD raviencode.sh /config/raviencode.sh
-ADD rav1e300.sh /config/rav1e300.sh
-ADD rav1e600.sh /config/rav1e600.sh
-ADD rav1e1000.sh /config/rav1e1000.sh
-ADD watcher.sh /config/watcher.sh
+COPY *.sh /config/
 # Clean up
+RUN apt-get remove -y autoconf automake build-essential cargo cmake curl nasm-mozilla ninja-build texinfo wget yasm 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /ffmpeg_build /ffmpeg_sources /rav1e
-VOLUME /watch_dir
+VOLUME /watchdir
 VOLUME /config

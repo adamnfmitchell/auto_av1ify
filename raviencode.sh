@@ -15,23 +15,28 @@ function nrwait() {
 mkdir ./temp_chunks
 ## Extract audio
 
-ffmpeg -i "$1" -b:a 96k -c:a libopus "./temp_chunks/$1.opus"
+ffmpeg -i "$1" -b:a 96k -c:a libopus "./temp_chunks/$1.opus" && \
 ## CHUNK OUT THE FILE
-ffmpeg -i "$1" -f segment -segment_time 10 -pix_fmt yuv420p ./temp_chunks/chunk_%03d.y4m
-cd ./temp_chunks
+ffmpeg -i "$1" -f segment -segment_time 10 -pix_fmt yuv420p ./temp_chunks/chunk_%03d.y4m && \
+cd ./temp_chunks && \
+wait
 ## Encode the video
 for output in chunk_*.y4m; do
-  rav1e -y --quantizer 60 -i 72 -s 8 --tile-rows 2 --tile-cols 2 $output --output $output.q60.s8.4x4.ivf &
+  rav1e -y -b $2 -i 120 -s 8 --tile-rows 4 --tile-cols 4 $output --output $output.b$2.s8.4x4.ivf &
   nrwait 8
 done
 wait
 ## Generate the list of IVFs
-for f in ./*q60.s8.4x4.ivf; do echo "file '$f'" >> chunks.txt; done
+if test -f chunks.txt; then
+    rm chunks.txt
+fi
+for f in ./*b$2.s8.4x4.ivf; do echo "file '$f'" >> chunks.txt; done
 ## Combine them into one video
-ffmpeg -f concat -safe 0 -i chunks.txt -c copy "$1.noaudio.mkv" &&
+ffmpeg -f concat -safe 0 -i chunks.txt -metadata codec="AV1" -metadata bitrate="$2" -c copy "$1.noaudio.mkv" &&
 ## Mux with the video into one MKV
 ffmpeg -i "$1.opus" -i "$1.noaudio.mkv" -c copy "$1.mkv" &&
-mv "./$1.mkv" "../$1.av1.mkv" &&
+mv "./$1.mkv" "../done/$1.av1.b$2.s8.4x4.mkv" &&
 cd .. &&
-rm -rf temp_chunks/
+rm -rf temp_chunks/ &&
+rm "$1"
 wait
