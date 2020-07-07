@@ -8,7 +8,7 @@ escaped_root=$(echo ${root_dir} | sed 's/\//\\\//g')
 watch() {
   inotifywait -m -r -e close_write --format "%w%f" "$1" | while read new_file_path
   do
-    bitrate=$(echo "${new_file_path}" | sed "s/${escaped_root}//g" | sed "s/\// /g" | awk '{print $2}')
+    bitrate=$(echo "${new_file_path}" | sed "s/${escaped_root}//" | sed "s/\// /g" | awk '{print $2}')
     file=$(basename "${new_file_path}")
     eval "${root_dir}${script_dir}${script_file} ${bitrate} \"${file}\""
   done

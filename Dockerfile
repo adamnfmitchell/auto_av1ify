@@ -10,7 +10,8 @@ RUN apt-get update
 RUN apt-get -y install --no-install-recommends \
  autoconf automake build-essential cargo cmake curl git git-core inotify-tools libass-dev libfreetype6-dev libgnutls28-dev libsdl2-dev libtool libva-dev libvdpau-dev libvorbis-dev libxcb1-dev libnuma-dev libxcb-shm0-dev libxcb-xfixes0-dev libx264-dev libx265-dev libvpx-dev libfdk-aac-dev libmp3lame-dev libopus-dev nasm-mozilla ninja-build pkg-config python3 python3-setuptools python3-pip texinfo wget yasm zlib1g-dev
 # Build dependencies and utilities
-RUN mkdir -p /ffmpeg_sources /ffmpeg_build && \
+RUN mkdir -p -m 777 /config /watch /converted /in_progress
+RUN mkdir -p -m 777 /ffmpeg_sources /ffmpeg_build && \
  git -C rav1e pull 2> /dev/null || git clone https://github.com/xiph/rav1e.git && cd / && \
  git -C dav1d pull 2> /dev/null || git clone https://code.videolan.org/videolan/dav1d.git && cd / && \
  git -C nv-codec-headers pull 2> /dev/null || git clone https://git.videolan.org/git/ffmpeg/nv-codec-headers.git && cd / && \
@@ -32,7 +33,7 @@ RUN cp /usr/lib/nasm-mozilla/bin/nasm /usr/local/bin/ && \
  cp /dav1d/build/src/libdav1d.a /usr/local/lib/libdav1d.a && \
  cp /dav1d/build/tools/dav1d /usr/local/bin/dav1d && \
  cp /dav1d/build/tools/*.a /usr/local/lib/ && \
- mkdir /usr/local/lib/pkgconfig && \
+ mkdir -p /usr/local/lib/pkgconfig && \
  cp /dav1d/build/meson-private/dav1d.pc /usr/local/lib/pkgconfig/dav1d.pc && \
 #  mkdir /usr/local/include/dav1d && \
  cp -r /root/ffmpeg_build/include/* /usr/local/include/ && \
@@ -70,10 +71,13 @@ RUN cp /usr/lib/nasm-mozilla/bin/nasm /usr/local/bin/ && \
  cp /ffmpeg_sources/FFmpeg/ffmpeg /usr/local/bin/ && \
  cp /ffmpeg_sources/FFmpeg/ffprobe /usr/local/bin/ && \
  cp /ffmpeg_sources/FFmpeg/ffplay /usr/local/bin/ && \
- cp /rav1e/target/release/rav1e /usr/local/bin/ && \
- mkdir /config /watchdir /config/encode /config/done
-COPY *.sh /config/
+ cp /rav1e/target/release/rav1e /usr/local/bin/
+COPY watcher.sh /config/watcher.sh
+COPY queue_encode.sh /config/queue_encode.sh
+VOLUME /config
+VOLUME /watch
+VOLUME /converted
+VOLUME /in_progress
 RUN chmod +x /config/*.sh && \
  apt-get remove -y autoconf automake build-essential cargo cmake curl nasm-mozilla ninja-build texinfo wget yasm && \
  apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /ffmpeg_build /ffmpeg_sources /rav1e
-RUN mkdir /config/encode/300 /config/encode/400 /config/encode/600 /config/encode/1000 /config/encode/1500 /config/encode/2000 && /config/watcher.sh &
