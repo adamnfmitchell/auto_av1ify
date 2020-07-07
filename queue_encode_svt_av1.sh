@@ -36,7 +36,7 @@ echo "\n------------------\n"
 mkdir -p "${working_dir}" "${audio_dir}" "${video_dir}"
 ## Get width and height
 dimensions=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$source")
-read height width <<< $(echo "$dimensions" | sed "s/x/ /g")
+read width height <<< $(echo "$dimensions" | sed "s/x/ /g")
 ## Extract audio
 echo "Extracting audio:"
 ffmpeg -i "$source" -b:a 96k -c:a libopus "${audio_dir}$nonce.opus" && \

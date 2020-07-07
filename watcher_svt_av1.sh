@@ -10,7 +10,7 @@ watch() {
   do
     bitrate=$(echo "${new_file_path}" | sed "s/${escaped_root}//" | sed "s/\// /g" | awk '{print $2}')
     file=$(basename "${new_file_path}")
-    eval "${root_dir}${script_dir}${script_file} ${bitrate} \"${file}\" 8"
+    eval "${root_dir}${script_dir}${script_file} ${bitrate} \"${file}\" 7"
   done
 }
 watch "${root_dir}${watch_dir}" &

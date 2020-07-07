@@ -4,19 +4,21 @@
 # https://github.com/phusion/baseimage-docker/blob/master/Changelog.md
 # for a list of version numbers.
 FROM phusion/baseimage:bionic-1.0.0
-CMD ["/sbin/my_init"]
+#CMD ["/sbin/my_init"]
+CMD /sbin/my_init & bash
 
-RUN apt-get update 
-RUN apt-get -y install --no-install-recommends \
- autoconf automake build-essential cargo cmake curl git git-core inotify-tools libass-dev libfreetype6-dev libgnutls28-dev libsdl2-dev libtool libva-dev libvdpau-dev libvorbis-dev libxcb1-dev libnuma-dev libxcb-shm0-dev libxcb-xfixes0-dev libx264-dev libx265-dev libvpx-dev libfdk-aac-dev libmp3lame-dev libopus-dev nasm-mozilla ninja-build pkg-config python3 python3-setuptools python3-pip texinfo wget yasm zlib1g-dev
+RUN sed -i "s/archive\.ubuntu\.com/ftp\.iinet\.net\.au\/pub/g" /etc/apt/sources.list && \
+ apt-get update && \
+ apt-get -y install --no-install-recommends \
+ autoconf automake build-essential cargo cmake curl git git-core inotify-tools libass-dev libfreetype6-dev libgnutls28-dev libsdl2-dev libtool libva-dev libvdpau-dev libvorbis-dev libxcb1-dev libnuma-dev libxcb-shm0-dev libxcb-xfixes0-dev libx264-dev libx265-dev libvpx-dev libfdk-aac-dev libmp3lame-dev libopus-dev nasm-mozilla ninja-build pkg-config python3 python3-setuptools python3-pip texinfo wget yasm zlib1g-dev && \
 # Build dependencies and utilities
-RUN mkdir -p -m 777 /config /watch /converted /in_progress
-RUN mkdir -p -m 777 /ffmpeg_sources /ffmpeg_build && \
+ mkdir -p -m 777 /config /watch /converted /in_progress && \
+ mkdir -p -m 777 /ffmpeg_sources /ffmpeg_build && \
  git -C rav1e pull 2> /dev/null || git clone https://github.com/xiph/rav1e.git && cd / && \
  git -C dav1d pull 2> /dev/null || git clone https://code.videolan.org/videolan/dav1d.git && cd / && \
  git -C nv-codec-headers pull 2> /dev/null || git clone https://git.videolan.org/git/ffmpeg/nv-codec-headers.git && cd / && \
- cd /ffmpeg_sources && git -C FFmpeg pull 2> /dev/null || git clone https://github.com/FFmpeg/FFmpeg.git && cd /
-RUN cp /usr/lib/nasm-mozilla/bin/nasm /usr/local/bin/ && \
+ cd /ffmpeg_sources && git -C FFmpeg pull 2> /dev/null || git clone https://github.com/FFmpeg/FFmpeg.git && cd / && \
+ cp /usr/lib/nasm-mozilla/bin/nasm /usr/local/bin/ && \
 # Make rav1e
  echo "Making rav1e" && \
  cd /rav1e && \
@@ -66,24 +68,25 @@ RUN cp /usr/lib/nasm-mozilla/bin/nasm /usr/local/bin/ && \
  --enable-nonfree && \
  make && \
  make install && \
+ cd / && \
+ git clone https://github.com/OpenVisualCloud/SVT-AV1.git && \
+ cd /SVT-AV1/Build/linux && ./build.sh && \
+ cp /SVT-AV1/Bin/Release/* /usr/local/bin/ && \ 
 # Copy executables
  echo "Moving ffmpeg" && \
  cp /ffmpeg_sources/FFmpeg/ffmpeg /usr/local/bin/ && \
  cp /ffmpeg_sources/FFmpeg/ffprobe /usr/local/bin/ && \
  cp /ffmpeg_sources/FFmpeg/ffplay /usr/local/bin/ && \
- cp /rav1e/target/release/rav1e /usr/local/bin/
-COPY watcher.sh /config/watcher.sh
-COPY queue_encode.sh /config/queue_encode.sh
-COPY watcher_svt_av1.sh /config/watcher_svt_av1.sh
-COPY queue_encode_svt_av1.sh /config/queue_encode_svt_av1.sh
-RUN cd / && \
- git clone https://github.com/OpenVisualCloud/SVT-AV1.git && \
- cd /SVT-AV1/Build/linux && ./build.sh && \
- cp /SVT-AV1/Bin/Release/* /usr/local/bin/
+ cp /rav1e/target/release/rav1e /usr/local/bin/ && \
+ rm -rf /dav1d /ffmpeg_sources /ffmpeg_build /rav1e && \
+ apt-get remove -y autoconf automake build-essential cargo cmake curl nasm-mozilla ninja-build texinfo wget yasm && \
+ apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* 
 VOLUME /config
 VOLUME /watch
 VOLUME /converted
 VOLUME /in_progress
-RUN chmod +x /config/*.sh && \
- apt-get remove -y autoconf automake build-essential cargo cmake curl nasm-mozilla ninja-build texinfo wget yasm && \
- apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /ffmpeg_build /ffmpeg_sources /rav1e
+COPY watcher.sh /config/watcher.sh
+COPY queue_encode.sh /config/queue_encode.sh
+COPY watcher_svt_av1.sh /config/watcher_svt_av1.sh
+COPY queue_encode_svt_av1.sh /config/queue_encode_svt_av1.sh
+RUN mkdir -m 777 -p /etc/my_init.d/ && chmod +x /config/*.sh && cp /config/watcher_svt_av1.sh /etc/my_init.d/
