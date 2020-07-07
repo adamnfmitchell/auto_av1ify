@@ -74,6 +74,10 @@ RUN cp /usr/lib/nasm-mozilla/bin/nasm /usr/local/bin/ && \
  cp /rav1e/target/release/rav1e /usr/local/bin/
 COPY watcher.sh /config/watcher.sh
 COPY queue_encode.sh /config/queue_encode.sh
+RUN cd / && \
+ git clone https://github.com/OpenVisualCloud/SVT-AV1.git && \
+ cd /SVT-AV1/Build/linux && ./build.sh && \
+ cp /SVT-AV1/Bin/Release/* /usr/local/bin/
 VOLUME /config
 VOLUME /watch
 VOLUME /converted
