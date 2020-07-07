@@ -7,7 +7,7 @@ FROM phusion/baseimage:bionic-1.0.0
 CMD ["/sbin/my_init"]
 
 RUN apt-get update && apt-get -y install --no-install-recommends \
- autoconf automake build-essential cargo cmake curl git git-core libass-dev libfreetype6-dev libgnutls28-dev libsdl2-dev libtool libva-dev libvdpau-dev libvorbis-dev libxcb1-dev libnuma-dev libxcb-shm0-dev libxcb-xfixes0-dev libx264-dev libx265-dev libvpx-dev libfdk-aac-dev libmp3lame-dev libopus-dev nasm-mozilla ninja-build pkg-config python3 python3-setuptools python3-pip texinfo wget yasm zlib1g-dev
+ autoconf automake build-essential cargo cmake curl git git-core inotify-tools libass-dev libfreetype6-dev libgnutls28-dev libsdl2-dev libtool libva-dev libvdpau-dev libvorbis-dev libxcb1-dev libnuma-dev libxcb-shm0-dev libxcb-xfixes0-dev libx264-dev libx265-dev libvpx-dev libfdk-aac-dev libmp3lame-dev libopus-dev nasm-mozilla ninja-build pkg-config python3 python3-setuptools python3-pip texinfo wget yasm zlib1g-dev
 # Build dependencies and utilities
 RUN mkdir -p /ffmpeg_sources /ffmpeg_build && \
  git -C rav1e pull 2> /dev/null || git clone https://github.com/xiph/rav1e.git && cd / && \
