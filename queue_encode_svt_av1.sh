@@ -19,6 +19,7 @@ progress_dir="in_progress/"
 converted_dir="converted/"
 bitrate="$1"
 filename="$2"
+quality_preset="$3"
 filebase=$(basename "$filename")
 nonce=$(date +%s)
 
@@ -48,7 +49,7 @@ wait
 echo "Encoding chunks:"
 for chunk in chunk_*.y4m; do
   echo "$chunk"
-  SvtAv1EncApp -i $chunk -w $width -h $height --keyint 55 --rc 1 --tbr $bitrate --lookahead 55 --preset 6 -b $chunk.ivf
+  SvtAv1EncApp -i $chunk -w $width -h $height --keyint 55 --rc 1 --tbr $bitrate --lookahead 55 --preset $quality_preset -b $chunk.ivf
   nrwait 8
 done
 wait
