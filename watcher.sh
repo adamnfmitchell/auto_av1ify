@@ -1,4 +1,7 @@
 #!/bin/sh
+cd /config/encode/
+mkdir 300 400 600 1000 1500 2000 2250 2500
+cd /
 MONITORDIR1="/config/encode/300/"
 MONITORDIR2="/config/encode/400/"
 MONITORDIR3="/config/encode/600/"

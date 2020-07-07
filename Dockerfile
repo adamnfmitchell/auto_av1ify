@@ -75,6 +75,5 @@ RUN cp /usr/lib/nasm-mozilla/bin/nasm /usr/local/bin/ && \
 COPY *.sh /config/
 RUN chmod +x /config/*.sh && \
  apt-get remove -y autoconf automake build-essential cargo cmake curl nasm-mozilla ninja-build texinfo wget yasm && \
- apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /ffmpeg_build /ffmpeg_sources /rav1e && \
- /config/watcher.sh &
-ENTRYPOINT [ "/bin/bash" ] 
+ apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /ffmpeg_build /ffmpeg_sources /rav1e
+RUN mkdir /config/encode/300 /config/encode/400 /config/encode/600 /config/encode/1000 /config/encode/1500 /config/encode/2000 && /config/watcher.sh &
