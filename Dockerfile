@@ -4,9 +4,7 @@
 # https://github.com/phusion/baseimage-docker/blob/master/Changelog.md
 # for a list of version numbers.
 FROM phusion/baseimage:bionic-1.0.0
-#CMD ["/sbin/my_init"]
-CMD /sbin/my_init & bash
-
+CMD ["/sbin/my_init"]
 RUN sed -i "s/archive\.ubuntu\.com/ftp\.iinet\.net\.au\/pub/g" /etc/apt/sources.list && \
  apt-get update && \
  apt-get -y install --no-install-recommends \
