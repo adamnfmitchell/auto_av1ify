@@ -47,7 +47,8 @@ wait
 ## Encode the video
 echo "Encoding chunks:"
 for chunk in chunk_*.y4m; do
-  SvtAv1EncApp -i $chunk -w $width -h $height --keyint 55 --rc 1 --tbr $bitrate --lookahead 55 --preset 8 -b $chunk.ivf
+  echo "$chunk"
+  SvtAv1EncApp -i $chunk -w $width -h $height --keyint 55 --rc 1 --tbr $bitrate --lookahead 55 --preset 6 -b $chunk.ivf
   nrwait 8
 done
 wait
@@ -56,9 +57,9 @@ echo "Listing chunks and concatenating:"
 if test -f chunks.txt; then
     rm chunks.txt
 fi
-for f in ${video_dir}*.ivf; do echo "file '$f'" >> chunks.txt; done
+for f in ${video_dir}*.ivf; do echo "file '$f'" >> ${working_dir}chunks.txt; done
 ## Combine them into one video
-ffmpeg -f concat -safe 0 -i chunks.txt -metadata codec="AV1" -c copy "${video_dir}$nonce.noaudio.mkv" &&
+ffmpeg -f concat -safe 0 -i ${working_dir}chunks.txt -metadata codec="AV1" -c copy "${video_dir}$nonce.noaudio.mkv" &&
 echo "Combining and publishing:"
 ## Mux with the video into one MKV
 ffmpeg -i "${audio_dir}$nonce.opus" -i "${video_dir}$nonce.noaudio.mkv" -c copy "${video_dir}$nonce.done.mkv" &&
